@@ -1,0 +1,26 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title><%= @title %></title>
+
+  <link rel="stylesheet" href="css/styles.css?v=1.0">
+  <script src="https://www.google.com/jsapi"></script>
+  <script src="js/chartkick.js"></script>
+</head>
+
+<body>
+<h1><%= @title %></h1>
+<h3>Generated: <%= @timestamp %></h3>
+
+<h2>Number of Results: <%= @results.length %></h2>
+
+<% @questions.each_with_index do |(question, type), idx| %>
+    <h2><%= "#{idx+1}. #{question}" %></h2>
+    <%= graph question, type %>
+<% end %>
+
+</body>
+</html>
