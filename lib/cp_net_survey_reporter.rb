@@ -1,5 +1,5 @@
-require "cp_net_survey_reporter/version"
+require_relative 'cp_net_survey_reporter/report_generator'
+require_relative 'cp_net_survey_reporter/version'
 
 module CpNetSurveyReporter
-  # Your code goes here...
 end
