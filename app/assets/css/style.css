@@ -1,13 +1,46 @@
-.graph {
+
+.chart {
+    margin-bottom: 50px;
+}
+
+.response-count {
+    width: 50%;
+    margin-bottom: 50px;
+    margin-left: 20%;
+}
+
+.response-count-title {
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.response-count-row {
+    clear: both;
+    margin-left: 10px;
     margin-bottom: 30px;
 }
+
+.response-count-label {
+    width: 60%;
+    float: left;
+    margin-left: 50px;
+    margin-bottom: 5px;
+}
+
+.response-count-value {
+    width: 10%;
+    text-align: right;
+    float: right;
+    margin-bottom: 5px;
+}
+
 .summary-section {
     margin-left: 40px;
 }
 
 .summary-item {
     width: 75%;
-    margin-bottom: 30px;
+    margin-bottom: 50px;
     border-bottom-style: dashed;
     border-bottom-width: 1px;
 }
