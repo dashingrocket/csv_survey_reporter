@@ -57,9 +57,10 @@ module CSVSurveyReporter
                           allowPointSelect: true,
                           cursor: 'pointer',
                           dataLabels: {
-                              enabled: false
+                              enabled: true,
+                              format: '{point.percentage:.1f}%'
                           },
-                          showInLegend: true
+                          showInLegend: true,
                       }
                   },
                   tooltip: {
