@@ -22,6 +22,12 @@ module CpNetSurveyReporter
       CSVHasher.hashify(csv_file, {original_col_as_keys: true})
     end
 
+    def get_binding
+      binding()
+    end
+
+    private
+
     def questions
       {
           'Who is your current internet provider?' => {type: :pie, other: 'Other - Write In:Who is your current internet provider?'},
@@ -55,6 +61,13 @@ module CpNetSurveyReporter
               type: :column,
               title: 'Internet Company Satisfaction'
           },
+
+          {
+              x: 'Do you require internet at home for your job, education, etc?',
+              y: 'Overall, how satisfied are you with your current internet provider?',
+              type: :column,
+              title: 'Required Internet Satisfaction'
+          },
       ]
     end
 
@@ -67,13 +80,12 @@ module CpNetSurveyReporter
       }
     end
 
-    def chart(question, type)
-      if type.is_a? Hash
-        other = type[:other]
-        display = type[:display] || question
-        type = type[:type]
+    def chart(question, details)
+      if details.is_a? Hash
+        display = details[:display] || question
+        type = details[:type]
       else
-        other = nil
+        type = details
         display = question
       end
 
@@ -102,13 +114,9 @@ module CpNetSurveyReporter
 
         when :column
           chart << column_chart(count_per(question), {library: {title: {text: display}} })
-        when :summary
-          # Not for graphing
         else
-          chart << "unknown chart type #{type}"
+          chart << "unknown chart type '#{type}'  Details: #{details}"
       end
-
-      chart << response_counts(other) if other
 
       chart
     end
@@ -123,7 +131,7 @@ module CpNetSurveyReporter
         when :column
           column_chart(x_per_y(x, y), {library: {title: {text: title}}} )
         else
-          "unknown type #{type}"
+          "unknown type '#{type}'"
       end
     end
 
@@ -157,20 +165,6 @@ module CpNetSurveyReporter
       array_data
     end
 
-    def response_counts(other)
-      output = '<div class="response-count">'
-      output << "<div class=\"response-count-title\">#{other}</div>"
-      counts = count_per(other)
-      counts.each do |response, count|
-        next if response.empty?
-        output << "<div class=\"response-count-row\">"
-        output << "<div class=\"response-count-label\">#{response}</div>"
-        output << "<div class=\"response-count-value\">#{count}</div>"
-        output << '</div>'
-      end
-      output << '</div>'
-    end
-
     def summarize(result)
       out = ''
         @summary.each do |question, details|
@@ -189,10 +183,6 @@ module CpNetSurveyReporter
         counts[response] += 1
       end
       counts.sort.to_h
-    end
-
-    def get_binding
-      binding()
     end
   end
 end

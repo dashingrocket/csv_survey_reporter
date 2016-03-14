@@ -13,27 +13,65 @@
 </head>
 
 <body>
-<h1><%= @title %></h1>
-<h3>Generated: <%= @timestamp %></h3>
+<header>
+  <h1><%= @title %></h1>
+  <h3>Generated: <%= @timestamp %></h3>
+  <h2>Number of Results: <%= @results.length %></h2>
+</header>
 
-<h2>Number of Results: <%= @results.length %></h2>
+<section>
+  <h2>Responses</h2>
+  <div class="response-section">
+    <% @questions.each_with_index do |(question, details), idx| %>
+        <div class="chart-block" id="response-chart-block-<%= idx %>">
+          <div class="chart" id="response-chart-<%= idx %>"><%= chart(question, details) %></div>
 
-<h2>Responses</h2>
+          <% if details.is_a?(Hash) && details[:other] %>
+              <div class="response-count-block">
+                <div class="response-count-title"><%= details[:other] %></div>
 
-<% @questions.each do |question, type| %>
-    <div class="chart"><%= chart(question, type) %></div>
-<% end %>
+                <% count_per(details[:other]).each_with_index do |(response, count), detail_idx| %>
+                    <% next if response.empty? %>
+                    <div class="response-count-row" id=response-count-row_<%= idx %>_<%= detail_idx %>">
+                      <div class="response-count-label" id=response-count-label_<%= idx %>_<%= detail_idx %>"><%= response %></div>
+                      <div class="response-count-value" id=response-count-value_<%= idx %>_<%= detail_idx %>"><%= count %></div>
+                    </div>
+                <% end %>
+              </div>
+          <% end %>
+        </div>
+    <% end %>
+  </div>
+</section>
 
-<h2>Analysis</h2>
-<% @analysis.each do |analysis| %>
-    <div class="chart"><%= analyze_chart(analysis) %></div>
-<% end %>
+<section>
+  <h2>Analysis</h2>
+  <div class="analysis-section">
+    <% @analysis.each_with_index do |analysis, idx| %>
+        <div class="chart" id="analysis-chart_<%= idx %>"><%= analyze_chart(analysis) %></div>
+    <% end %>
+  </div>
+</section>
 
-<h2>Summary</h2>
-<div class="summary-section">
-  <% @results.each do |result| %>
-      <div class="summary-item"><%= summarize(result) %></div>
-  <% end %>
-</div>
+<section>
+  <h2>Summary</h2>
+  <div class="summary-section">
+    <% @results.each_with_index do |result, idx| %>
+        <div class="summary-item" id="summary-item_<%= idx %>">
+          <% @summary.each.with_index do |(question, details), item_idx| %>
+              <% display = details[:display] || question %>
+              <div class="summary-item-row" id="summary-item-row_<%=idx%>_<%=item_idx%>">
+                <div class="summary-item-label" id="summary-item-label_<%=idx%>_<%=item_idx%>"><%= display %></div>
+                <div class="summary-item-value" id="summary-item-value_<%=idx%>_<%=item_idx%>"><%= result[question] %></div>
+              </div>
+          <% end %>
+        </div>
+    <% end %>
+  </div>
+</section>
+
+<footer>
+  Footer Details
+</footer>
 </body>
 </html>
