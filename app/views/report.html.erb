@@ -13,65 +13,75 @@
 </head>
 
 <body>
-<header>
-  <h1><%= @title %></h1>
-  <h3>Generated: <%= @timestamp %></h3>
-  <h2>Number of Results: <%= @results.length %></h2>
-</header>
 
-<section>
-  <h2>Responses</h2>
-  <div class="response-section">
-    <% @questions.each_with_index do |(question, details), idx| %>
-        <div class="chart-block" id="response-chart-block-<%= idx %>">
-          <div class="chart" id="response-chart-<%= idx %>"><%= chart(question, details) %></div>
+<nav>
+  <a href="#responses">Responses</a> |
+  <a href="#analysis">Analysis</a> |
+  <a href="#summary">Summary</a>
+</nav>
 
-          <% if details.is_a?(Hash) && details[:other] %>
-              <div class="response-count-block">
-                <div class="response-count-title"><%= details[:other] %></div>
+<div class="content">
+  <header>
+    <h1><%= @title %></h1>
+    <h4>Generated: <%= @timestamp %></h4>
+  </header>
 
-                <% count_per(details[:other]).each_with_index do |(response, count), detail_idx| %>
-                    <% next if response.empty? %>
-                    <div class="response-count-row" id=response-count-row_<%= idx %>_<%= detail_idx %>">
-                      <div class="response-count-label" id=response-count-label_<%= idx %>_<%= detail_idx %>"><%= response %></div>
-                      <div class="response-count-value" id=response-count-value_<%= idx %>_<%= detail_idx %>"><%= count %></div>
-                    </div>
-                <% end %>
-              </div>
-          <% end %>
-        </div>
-    <% end %>
-  </div>
-</section>
+  <section>
+    <h3>Number of Results: <%= @results.length %></h3>
+    <h2 id="responses">Responses</h2>
+    <div class="response-section">
+      <% @questions.each_with_index do |(question, details), idx| %>
+          <div class="chart-block" id="response-chart-block-<%= idx %>">
+            <div class="chart" id="response-chart-<%= idx %>"><%= chart(question, details) %></div>
 
-<section>
-  <h2>Analysis</h2>
-  <div class="analysis-section">
-    <% @analysis.each_with_index do |analysis, idx| %>
-        <div class="chart" id="analysis-chart_<%= idx %>"><%= analyze_chart(analysis) %></div>
-    <% end %>
-  </div>
-</section>
+            <% if details.is_a?(Hash) && details['other'] %>
+                <div class="response-count-block">
+                  <div class="response-count-title"><%= details['other'] %></div>
 
-<section>
-  <h2>Summary</h2>
-  <div class="summary-section">
-    <% @results.each_with_index do |result, idx| %>
-        <div class="summary-item" id="summary-item_<%= idx %>">
-          <% @summary.each.with_index do |(question, details), item_idx| %>
-              <% display = details[:display] || question %>
-              <div class="summary-item-row" id="summary-item-row_<%=idx%>_<%=item_idx%>">
-                <div class="summary-item-label" id="summary-item-label_<%=idx%>_<%=item_idx%>"><%= display %></div>
-                <div class="summary-item-value" id="summary-item-value_<%=idx%>_<%=item_idx%>"><%= result[question] %></div>
-              </div>
-          <% end %>
-        </div>
-    <% end %>
-  </div>
-</section>
+                  <% count_per(details['other']).each_with_index do |(response, count), detail_idx| %>
+                      <% next if response.empty? %>
+                      <div class="response-count-row" id=response-count-row_<%= idx %>_<%= detail_idx %>">
+                        <div class="response-count-label" id=response-count-label_<%= idx %>_<%= detail_idx %>"><%= response %></div>
+                        <div class="response-count-value" id=response-count-value_<%= idx %>_<%= detail_idx %>"><%= count %></div>
+                      </div>
+                  <% end %>
+                </div>
+            <% end %>
+          </div>
+      <% end %>
+    </div>
+  </section>
 
+  <section>
+    <h2 id="analysis">Analysis</h2>
+    <div class="analysis-section">
+      <% @analysis.each_with_index do |analysis, idx| %>
+          <div class="analysis-block chart" id="analysis-chart_<%= idx %>"><%= analyze_chart(analysis) %></div>
+      <% end %>
+    </div>
+  </section>
+
+  <section>
+    <h2 id="summary">Summary</h2>
+    <div class="summary-section">
+      <% @results.each_with_index do |result, idx| %>
+          <div class="summary-item" id="summary-item_<%= idx %>">
+            <% @summary.each.with_index do |(question, details), item_idx| %>
+                <% display = details['display'] || question %>
+                <div class="summary-item-row" id="summary-item-row_<%= idx %>_<%= item_idx %>">
+                  <div class="summary-item-label" id="summary-item-label_<%= idx %>_<%= item_idx %>"><%= display %></div>
+                  <div class="summary-item-value" id="summary-item-value_<%= idx %>_<%= item_idx %>"><%= result[question] %></div>
+                </div>
+            <% end %>
+          </div>
+      <% end %>
+    </div>
+  </section>
+</div>
 <footer>
-  Footer Details
+  Generated by <a href="<%= @spec.homepage %>" target="_blank"><%= @spec.name %></a> version <%= @spec.version %>
+  on <%= @timestamp %>
 </footer>
+
 </body>
 </html>

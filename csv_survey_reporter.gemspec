@@ -4,14 +4,14 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'cp_net_survey_reporter/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'cp_net_survey_reporter'
-  spec.version       = CpNetSurveyReporter::VERSION
+  spec.name          = 'csv_survey_reporter'
+  spec.version       = CSVSurveyReporter::VERSION
   spec.authors       = ['Jesse Bowes']
   spec.email         = ['TODO: Write your email address']
 
   spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = 'https://github.com/dashingrocket/csv_survey_reporter'
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
@@ -29,7 +29,8 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'trollop', '~> 2.0'
   spec.add_runtime_dependency 'chartkick', '~> 1.4'
-  spec.add_runtime_dependency 'csv_hasher'
+  spec.add_runtime_dependency 'csv_hasher', '~> 0.1'
+  spec.add_runtime_dependency 'hocon', '~> 0.9'
 
   spec.add_development_dependency 'bundler', '~> 1.11'
   spec.add_development_dependency 'rake', '~> 10.0'

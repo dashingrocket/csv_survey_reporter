@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in cp_net_survey_reporter.gemspec
+# Specify your gem's dependencies in csv_survey_reporter.gemspec
 gemspec

@@ -1,6 +1,6 @@
 require 'erb'
 
-module CpNetSurveyReporter
+module CSVSurveyReporter
   class ReportGenerator
     def initialize (output_dir)
       FileUtils.rm_rf output_dir if File.exists? output_dir

@@ -2,20 +2,24 @@ require 'csv_hasher'
 require 'chartkick'
 require 'set'
 
-module CpNetSurveyReporter
+require_relative 'version'
+
+module CSVSurveyReporter
   class Report
     include Chartkick::Helper
 
-    def initialize(csv_file, title='Report')
-      @title = title
+    def initialize(csv_file, config)
+      check_config(config)
+
+      @title = config['report_name']
+      @questions = config['questions'] || {}
+      @analysis = config['analysis'] || []
+      @summary = config['summary'] || {}
       @timestamp = Time.now.strftime('%c')
       @results = parse_results(csv_file)
-      @questions = questions
-      @analysis = analysis
-      @summary = summary
 
-      require 'pp'
-      pp @results.first
+      spec_file = File.join(__dir__, '..','..','csv_survey_reporter.gemspec')
+      @spec = Gem::Specification::load spec_file
     end
 
     def parse_results(csv_file)
@@ -28,62 +32,14 @@ module CpNetSurveyReporter
 
     private
 
-    def questions
-      {
-          'Who is your current internet provider?' => {type: :pie, other: 'Other - Write In:Who is your current internet provider?'},
-          'Overall, how satisfied are you with your current internet provider?' => :pie,
-          'How interested are you in higher speed internet service?' => :pie,
-          'What kind of internet household do you live in?' => :pie,
-
-          "Download:What speed internet service do you subscribe to? If your service offers a guaranteed minimum and an 'up to' speed, put your 'up to' speed here" => {type: :column, display: 'Subscribed Download Speed'},
-          "Upload:What speed internet service do you subscribe to? If your service offers a guaranteed minimum and an 'up to' speed, put your 'up to' speed here" => {type: :column, display: 'Subscribed Upload Speed'},
-          "Download:What internet speed do you typically receive during the day?If you aren't sure, consider running a speedtest at http://www.speedtest.net -- you have to be at home for the numbers to be useful" => {type: :column, display: 'Daytime Download Speed'},
-          "Upload:What internet speed do you typically receive during the day?If you aren't sure, consider running a speedtest at http://www.speedtest.net -- you have to be at home for the numbers to be useful" => {type: :column, display: 'Daytime Upload Speed'},
-          "Download:What internet speed do you typically receive during the evening?If you aren't sure, consider running a speedtest at http://www.speedtest.net -- you have to be at home for the numbers to be useful" => {type: :column, display: 'Evening Download Speed'},
-          "Upload:What internet speed do you typically receive during the evening?If you aren't sure, consider running a speedtest at http://www.speedtest.net -- you have to be at home for the numbers to be useful" => {type: :column, display: 'Evening Upload Speed'},
-
-          # TODO DOWNLOAD/UPLOAD Comparison
-          'How much do you currently pay for internet service per month?' => :pie,
-          'Do you require internet at home for your job, education, etc?' => :pie,
-          'Which best describes your primary telephone service at home?' => {type: :pie, other: 'Other - Write In:Which best describes your primary telephone service at home?'},
-          'What is your resident status in Crystal Park?' => :pie,
-      }
-      # TODO Make this a yaml?
-
-      # TODO Satisfaction per subscriber
+    def check_config(config)
+      raise 'No report_name in config' unless config['report_name']
     end
-
-    def analysis
-      [
-          {
-              x: 'Who is your current internet provider?',
-              y: 'Overall, how satisfied are you with your current internet provider?',
-              type: :column,
-              title: 'Internet Company Satisfaction'
-          },
-
-          {
-              x: 'Do you require internet at home for your job, education, etc?',
-              y: 'Overall, how satisfied are you with your current internet provider?',
-              type: :column,
-              title: 'Required Internet Satisfaction'
-          },
-      ]
-    end
-
-    def summary
-      {
-          'Name:Contact' => {display: 'Name'},
-          'Street Address(important if you do not currently have service or are limited to satellite):Contact' => {display: 'Address'},
-          'Email Address(if you would like to receive updates from the internet committee):Contact' => {display: 'Email Address'},
-          'Additional Comments' => {}
-      }
-    end
-
+   
     def chart(question, details)
       if details.is_a? Hash
-        display = details[:display] || question
-        type = details[:type]
+        display = details['display'] || question
+        type = details['type']
       else
         type = details
         display = question
@@ -92,7 +48,7 @@ module CpNetSurveyReporter
       chart = ''
 
       case type
-        when :pie
+        when 'pie'
           chart << pie_chart(count_per(question), {
               library: {
                   title: {text: display},
@@ -112,7 +68,7 @@ module CpNetSurveyReporter
               }
           })
 
-        when :column
+        when 'column'
           chart << column_chart(count_per(question), {library: {title: {text: display}} })
         else
           chart << "unknown chart type '#{type}'  Details: #{details}"
@@ -122,29 +78,57 @@ module CpNetSurveyReporter
     end
 
     def analyze_chart(analysis)
-      type = analysis[:type]
-      x = analysis[:x]
-      y = analysis[:y]
-      title = analysis[:title]
+      type = analysis['type']
+      group = analysis['group']
+      result = analysis['result']
+      title = analysis['title']
+
+      group_label = analysis['group_label'] || ''
+      result_label = analysis['result_label'] || ''
 
       case type
-        when :column
-          column_chart(x_per_y(x, y), {library: {title: {text: title}}} )
+        when 'column'
+          column_chart(group_per_result(group, result), {
+              library: {
+                  title: {
+                      text: title
+                  },
+                  xAxis: {
+                      title: {
+                          text: group_label
+                      },
+                      crosshair: true
+                  },
+                  yAxis: {
+                      title: {
+                          text: result_label
+                      }
+                  },
+                  tooltip: {
+                      headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                      pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                          '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                      footerFormat: '</table>',
+                      shared: true,
+                      useHTML: true
+                  }
+              }
+          })
         else
           "unknown type '#{type}'"
       end
     end
 
-    def x_per_y(x, y)
+    def group_per_result(group_field, result_field)
       x_axis = Set.new
 
       data = {}
 
       @results.each do |result|
-        x_axis << result[x]
-        data[result[y]] ||= {}
-        data[result[y]][result[x]] ||= 0
-        data[result[y]][result[x]] += 1
+        x_axis << result[group_field]
+        data[result[result_field]] ||= {}
+        data[result[result_field]][result[group_field]] ||= 0
+        data[result[result_field]][result[group_field]] += 1
       end
 
       x_axis = x_axis.to_a.sort
@@ -168,7 +152,7 @@ module CpNetSurveyReporter
     def summarize(result)
       out = ''
         @summary.each do |question, details|
-          display = details[:display] || question
+          display = details['display'] || question
           out << "<div class=\"summary-item-label\">#{display}</div>"
           out << "<div class=\"summary-item-value\"'>#{result[question]}</div>"
         end

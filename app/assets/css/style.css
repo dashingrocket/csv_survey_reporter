@@ -1,24 +1,43 @@
+.content {
+    margin-left: 30px;
+    padding: 20px;
+    margin-bottom: 30px;
+    width: 80%;
+    border: thin ridge #EBF4FA;
+}
+
+header {
+    text-align: center;
+}
+
+footer {
+    font-style: italic;
+}
+
 .response-section {
     margin-left: 40px;
-    width: 70%;
 }
 
 .analysis-section {
     margin-left: 40px;
-    width: 70%;
 }
 
 .summary-section {
     margin-left: 40px;
-    width: 70%;
 }
 
 .chart-block {
-
-}
+     border: thin ridge;
+     margin-bottom: 15px;
+ }
 
 .chart {
     margin-bottom: 50px;
+}
+
+.analysis-block {
+    border: thin ridge;
+    margin-bottom: 15px;
 }
 
 .response-count-block {
@@ -60,10 +79,8 @@
     margin-bottom: 5px;
 }
 
-
 .summary-item {
     width: 75%;
-    #margin-bottom: 50px;
     border: thin ridge;
 }
 

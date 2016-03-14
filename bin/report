@@ -2,19 +2,28 @@
 require 'rubygems'
 require 'bundler/setup'
 
+require 'hocon'
+
 require 'fileutils'
 require 'trollop'
 
-require_relative '../lib/cp_net_survey_reporter'
+require_relative '../lib/csv_survey_reporter'
 
 TEMPLATE_FILE = File.join(__dir__, '..', 'app', 'views', 'report.html.erb')
 
 opts = Trollop::options do
-  version "cp_net_survey_reporter #{CpNetSurveyReporter::VERSION}"
+  version "cp_net_survey_reporter #{CSVSurveyReporter::VERSION}"
   opt :input, 'CSV File to process', type: :string, required: true
   opt :output, 'Report output directory', type: :string, required: true
+  opt :config, 'Config file (JSON/HOCON format)', type: :string, required: true
 end
 
-generator = CpNetSurveyReporter::ReportGenerator.new(opts[:output])
-report = CpNetSurveyReporter::Report.new(opts[:input], 'Crystal Park Internet Survey Report')
+config_file = opts[:config]
+
+raise "Config file '#{config_file}' is not a file." unless File.file? config_file
+
+config = Hocon.load config_file
+
+generator = CSVSurveyReporter::ReportGenerator.new(opts[:output])
+report = CSVSurveyReporter::Report.new(opts[:input], config)
 generator.generate(report, TEMPLATE_FILE)
