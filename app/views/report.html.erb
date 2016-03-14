@@ -6,8 +6,9 @@
 
   <title><%= @title %></title>
 
-  <link rel="stylesheet" href="css/styles.css?v=1.0">
+  <link rel="stylesheet" href="css/style.css?v=1.0">
   <script src="https://www.google.com/jsapi"></script>
+  <!--<script src="https://code.highcharts.com/highcharts.js"></script>-->
   <script src="js/chartkick.js"></script>
 </head>
 
@@ -17,10 +18,11 @@
 
 <h2>Number of Results: <%= @results.length %></h2>
 
-<% @questions.each_with_index do |(question, type), idx| %>
-    <h2><%= "#{idx+1}. #{question}" %></h2>
-    <%= graph question, type %>
+<% @questions.each do |question, type| %>
+    <div class='graph'><%= graph(question, type) %></div>
 <% end %>
 
+<h2>Summary</h2>
+<%= summarize %>
 </body>
 </html>
